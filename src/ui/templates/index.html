@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>Job Application Bot</h1>
+    <form method="post">
+        <label>Job URL:</label><br>
+        <input type="text" name="job_url" required><br><br>
+        <input type="submit" value="Apply">
+    </form>
+    {% if message %}
+        <p>{{ message }}</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environment
+.env
+
+# Logs
+logs/
+!logs/.gitkeep
+
+# Browser
+browser/
+
+# 2Captcha
+2captcha-python/
