@@ -1,13 +1,13 @@
 # Workable Job Application Bot
 
 An automated tool for applying to jobs on Workable.com, featuring intelligent form detection and filling capabilities.
-
+<!--  make sure two columns each column has one image -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
     <div>
-        <img src="https://github.com/user-attachments/assets/50a53d30-5a20-41a9-a1db-a3aee4ea8696" alt="Image" style="width: 100%;">
+        <img src="https://github.com/user-attachments/assets/50a53d30-5a20-41a9-a1db-a3aee4ea8696" alt="Image" style="max-width: 100%;">
     </div>
     <div>
-        <img src="https://github.com/user-attachments/assets/5a40abe3-1b4d-49af-875c-53f1e8cf49f3" alt="Image" style="width: 100%;">
+        <img src="https://github.com/user-attachments/assets/5a40abe3-1b4d-49af-875c-53f1e8cf49f3" alt="Image" style="max-width: 100%;">
     </div>
 </div>
 
@@ -61,7 +61,7 @@ For a URL like `https://jobs.workable.com/view/...`:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/workable-job-applier.git
+git clone https://github.com/hxtruong6/workable-job-application-bot
 cd workable-job-applier
 ```
 
@@ -70,6 +70,10 @@ cd workable-job-applier
 ```bash
 conda create -n workable-job-applier python=3.11
 conda activate workable-job-applier
+
+pip install --upgrade pip
+pip install playwright
+playwright install
 ```
 
 3. Install dependencies:
@@ -127,7 +131,7 @@ workable-job-applier/
 
 ```
 TWOCAPTCHA_API_KEY=your_api_key_here
-HEADLESS=true
+HEADLESS=false # true or false
 DEFAULT_TIMEOUT=30000
 ```
 

@@ -1,6 +1,15 @@
-from playwright.sync_api import sync_playwright, Page, Browser, BrowserContext
+from typing import Optional, Dict, Any
+from playwright.async_api import (
+    async_playwright,
+    Page,
+    Browser,
+    BrowserContext,
+    Playwright,
+)
 from src.config.settings import settings
 from src.utils.logger import get_logger
+import time
+from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = get_logger(__name__)
 
@@ -8,65 +17,147 @@ logger = get_logger(__name__)
 class BrowserManager:
     """Manages browser instances and provides methods for browser operations."""
 
-    def __init__(self):
-        self.playwright = None
-        self.browser: Browser = None
-        self.context: BrowserContext = None
+    def __init__(self, proxy_config: Optional[Dict[str, str]] = None):
+        self.playwright: Optional[Playwright] = None
+        self.browser: Optional[Browser] = None
+        self.context: Optional[BrowserContext] = None
         self._is_started = False
+        self._is_closed = False
+        self.proxy_config = proxy_config or {}
+        self._page_count = 0
 
-    def start(self) -> "BrowserManager":
+    async def start(self) -> "BrowserManager":
         """Initialize the browser and create a new context."""
         try:
-            self.playwright = sync_playwright().start()
+            if self._is_started:
+                logger.warning("Browser already started")
+                return self
+
+            logger.info("Starting browser initialization...")
+            self.playwright = await async_playwright().start()
             browser_type = getattr(self.playwright, settings.BROWSER_TYPE)
 
-            self.browser = browser_type.launch(
-                headless=settings.HEADLESS,
-                args=["--no-sandbox", "--disable-setuid-sandbox"],
-            )
+            launch_options = {
+                "headless": settings.HEADLESS,
+                "args": ["--no-sandbox", "--disable-setuid-sandbox"],
+            }
 
-            self.context = self.browser.new_context(
-                user_agent=settings.USER_AGENT, viewport={"width": 1920, "height": 1080}
-            )
+            if self.proxy_config:
+                launch_options["proxy"] = self.proxy_config
 
+            logger.debug("Launching browser...")
+            self.browser = await browser_type.launch(**launch_options)
+
+            context_options = {
+                "user_agent": settings.USER_AGENT,
+                "viewport": {"width": 1920, "height": 1080},
+                "ignore_https_errors": True,
+            }
+
+            if self.proxy_config:
+                context_options["proxy"] = self.proxy_config
+
+            logger.debug("Creating browser context...")
+            self.context = await self.browser.new_context(**context_options)
             self._is_started = True
+            self._is_closed = False
             logger.info("Browser initialized successfully")
             return self
 
         except Exception as e:
             logger.error(f"Failed to initialize browser: {str(e)}")
-            self.close()
+            await self.close()
             raise
 
-    def new_page(self) -> Page:
-        """Create a new page with default timeout."""
-        if not self._is_started:
-            raise RuntimeError("Browser not started. Call start() first.")
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        reraise=True,
+    )
+    async def new_page(self) -> Page:
+        """Create a new page with default timeout and retry mechanism."""
+        if not self._is_started or self._is_closed:
+            raise RuntimeError(
+                "Browser not started or already closed. Call start() first."
+            )
 
-        page = self.context.new_page()
-        page.set_default_timeout(settings.DEFAULT_TIMEOUT)
-        logger.debug("New page created")
-        return page
-
-    def close(self):
-        """Close the browser and cleanup resources."""
         try:
+            if not self.context:
+                raise RuntimeError("Browser context is not initialized")
+
+            logger.debug("Creating new page...")
+            page = await self.context.new_page()
+            page.set_default_timeout(settings.DEFAULT_TIMEOUT)
+            self._page_count += 1
+            logger.debug(f"New page created (total: {self._page_count})")
+            return page
+        except Exception as e:
+            logger.error(f"Failed to create new page: {str(e)}")
+            raise
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=4, max=10),
+        reraise=True,
+    )
+    async def goto_page(self, url: str, page: Page) -> None:
+        """Navigate to a URL with retry mechanism."""
+        try:
+            if not self._is_started or self._is_closed:
+                raise RuntimeError("Browser not started or already closed")
+
+            logger.debug(f"Navigating to {url}...")
+            await page.goto(url, wait_until="networkidle")
+            logger.info(f"Successfully navigated to {url}")
+        except Exception as e:
+            logger.error(f"Failed to navigate to {url}: {str(e)}")
+            raise
+
+    async def close(self):
+        """Close the browser and cleanup resources."""
+        if self._is_closed:
+            logger.debug("Browser already closed")
+            return
+
+        try:
+            logger.debug("Starting browser cleanup...")
             if self.context:
-                self.context.close()
+                await self.context.close()
+                logger.debug("Browser context closed")
             if self.browser:
-                self.browser.close()
+                await self.browser.close()
+                logger.debug("Browser closed")
             if self.playwright:
-                self.playwright.stop()
+                await self.playwright.stop()
+                logger.debug("Playwright stopped")
+
             self._is_started = False
-            logger.info("Browser closed successfully")
+            self._is_closed = True
+            self._page_count = 0
+            logger.info("Browser cleanup completed successfully")
         except Exception as e:
             logger.error(f"Error while closing browser: {str(e)}")
             raise
 
-    def __enter__(self):
-        """Context manager entry."""
-        return self.start()
+    async def __aenter__(self):
+        """Async context manager entry."""
+        return await self.start()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit."""
-        self.close()
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async context manager exit."""
+        await self.close()
+
+    @property
+    def is_started(self) -> bool:
+        """Check if browser is started."""
+        return self._is_started
+
+    @property
+    def is_closed(self) -> bool:
+        """Check if browser is closed."""
+        return self._is_closed
+
+    @property
+    def page_count(self) -> int:
+        """Get the current number of open pages."""
+        return self._page_count

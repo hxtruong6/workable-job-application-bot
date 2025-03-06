@@ -16,3 +16,5 @@ browser/
 
 # 2Captcha
 2captcha-python/
+
+.pytest_cache/

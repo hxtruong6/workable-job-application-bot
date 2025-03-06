@@ -16,8 +16,8 @@ class Settings:
         raise ValueError("TWOCAPTCHA_API_KEY environment variable is required")
 
     # Application Settings
-    HEADLESS = os.getenv("HEADLESS", "true").lower() == "true"
-    DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_TIMEOUT", "30000"))
+    HEADLESS = False  # Set to True for production
+    DEFAULT_TIMEOUT = 30000  # 30 seconds in milliseconds
 
     # Logging Configuration
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -25,11 +25,8 @@ class Settings:
     LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     # Browser Settings
-    BROWSER_TYPE = os.getenv("BROWSER_TYPE", "chromium")
-    USER_AGENT = os.getenv(
-        "USER_AGENT",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-    )
+    BROWSER_TYPE = "chromium"  # or "firefox" or "webkit"
+    USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 
     # File Paths
     RESUME_DIR = BASE_DIR / "data" / "resumes"
