@@ -340,6 +340,54 @@
             });
         });
     });
+
+    function addExperience() {
+        const container = document.getElementById('experience-container');
+        const experienceCount = container.getElementsByClassName('experience-item').length;
+
+        const newExperience = `
+            <div class="experience-item">
+                <input type="hidden" name="experience_count" value="${experienceCount + 1}">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Job Title:</label>
+                        <input type="text" class="form-control" name="job_title_${experienceCount}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Company:</label>
+                        <input type="text" class="form-control" name="company_${experienceCount}" required>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6">
+                        <label>Location:</label>
+                        <input type="text" class="form-control" name="location_${experienceCount}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>Start Date:</label>
+                        <input type="text" class="form-control" name="start_date_${experienceCount}">
+                    </div>
+                    <div class="col-md-3">
+                        <label>End Date:</label>
+                        <input type="text" class="form-control" name="end_date_${experienceCount}">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <label>Responsibilities (one per line):</label>
+                        <textarea class="form-control" name="responsibilities_${experienceCount}" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', newExperience);
+
+        // Update all experience_count inputs
+        const countInputs = container.querySelectorAll('input[name="experience_count"]');
+        countInputs.forEach(input => {
+            input.value = experienceCount + 1;
+        });
+    }
 </script>
 
 

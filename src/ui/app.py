@@ -1,11 +1,18 @@
+import sys
+
+sys.path.append("..")
+sys.path.append(".")
+
 from flask import Flask, render_template, request, jsonify
 import json
 import os
+from pathlib import Path
+from src.config.settings import settings
 
 app = Flask(__name__)
 
-# Path to user metadata file
-USER_METADATA_FILE = "data/user_metadata.json"
+# Update path to use settings
+USER_METADATA_FILE = str(settings.USER_METADATA_PATH)
 
 
 # Load user metadata
