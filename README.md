@@ -13,7 +13,7 @@ An automated tool for applying to jobs on Workable.com, featuring intelligent fo
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.11+
 - 2Captcha API key
 - Modern web browser (Chrome/Chromium recommended)
 
@@ -57,16 +57,16 @@ cp .env.example .env
 ### Command Line Interface
 
 ```bash
-python main.py --job-url "https://jobs.workable.com/..." --metadata-path "data/user_metadata.json"
+sh start_apply_job.sh
 ```
 
 ### Web Interface
 
 ```bash
-python -m ui.app
+sh start_ui_web.sh
 ```
 
-Then open your browser to `http://localhost:5000`
+Then open your browser to `http://localhost:8080`
 
 ## Project Structure
 

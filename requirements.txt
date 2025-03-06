@@ -1,7 +1,7 @@
 playwright==1.41.2
 requests==2.31.0
 2captcha-python==1.5.1
-flask==3.0.2
+flask[async]==3.0.2
 pydantic==2.6.3
 python-dotenv==1.0.1
 loguru==0.7.2
