@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Workable Job Application Bot</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -10,7 +12,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 30px auto;
         }
 
@@ -20,10 +22,6 @@
             margin-bottom: 20px;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
-
         .tab-content {
             padding: 20px;
         }
@@ -31,19 +29,43 @@
         .nav-tabs {
             background-color: #fff;
             border-bottom: none;
-            padding: 10px 10px 0;
         }
 
-        .alert {
-            margin-bottom: 20px;
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .experience-item {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .experience-item h5 {
+            margin-bottom: 5px;
+        }
+
+        .badge {
+            margin-right: 5px;
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
         }
     </style>
 </head>
 
 <body>
+
     <div class="container">
         <h1 class="text-center mb-4">Workable Job Application Bot</h1>
-    
+
         {% if message %}
         <div class="alert {% if 'Error' in message %}alert-danger{% else %}alert-success{% endif %}">
             {{ message }}
@@ -57,12 +79,13 @@
                         <a class="nav-link active" data-bs-toggle="tab" href="#apply">Apply to Job</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#profile">Profile Settings</a>
+                        <a class="nav-link" data-bs-toggle="tab" href="#profile">Profile</a>
                     </li>
                 </ul>
             </div>
             <div class="card-body">
                 <div class="tab-content">
+
                     <!-- Job Application Tab -->
                     <div id="apply" class="tab-pane active">
                         <form method="post">
@@ -70,140 +93,254 @@
                                 <label for="job_url">Job URL:</label>
                                 <input type="text" class="form-control" id="job_url" name="job_url" required
                                     placeholder="https://jobs.workable.com/view/...">
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit Application</button>
-                                </form>
-                                </div>
-                                
-                                <!-- Profile Settings Tab -->
-                                <div id="profile" class="tab-pane fade">
-                                    <form method="post">
-                                        <input type="hidden" name="save_metadata" value="1">
-                                
-                                        <h4 class="mb-3">Personal Information</h4>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Full Name:</label>
-                                                    <input type="text" class="form-control" name="name" value="{{ metadata.name }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Years of Experience:</label>
-                                                    <input type="text" class="form-control" name="years_of_experience"
-                                                        value="{{ metadata.years_of_experience }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <h4 class="mb-3 mt-4">Contact Information</h4>
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Email:</label>
-                                                    <input type="email" class="form-control" name="email"
-                                                        value="{{ metadata.contact_information.email }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>Phone:</label>
-                                                    <input type="tel" class="form-control" name="phone"
-                                                        value="{{ metadata.contact_information.phone }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="form-group">
-                                                    <label>LinkedIn:</label>
-                                                    <input type="url" class="form-control" name="linkedin"
-                                                        value="{{ metadata.contact_information.linkedin }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <h4 class="mb-3 mt-4">Address</h4>
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>City:</label>
-                                                    <input type="text" class="form-control" name="city"
-                                                        value="{{ metadata.contact_information.current_address.city }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>State:</label>
-                                                    <input type="text" class="form-control" name="state"
-                                                        value="{{ metadata.contact_information.current_address.state }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>Country:</label>
-                                                    <input type="text" class="form-control" name="country"
-                                                        value="{{ metadata.contact_information.current_address.country }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>ZIP Code:</label>
-                                                    <input type="text" class="form-control" name="zip_code"
-                                                        value="{{ metadata.contact_information.current_address.zip_code }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <h4 class="mb-3 mt-4">Education</h4>
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>Degree:</label>
-                                                    <input type="text" class="form-control" name="degree"
-                                                        value="{{ metadata.education[0].degree if metadata.education }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>Field of Study:</label>
-                                                    <input type="text" class="form-control" name="field_of_study"
-                                                        value="{{ metadata.education[0].field_of_study if metadata.education }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>Institution:</label>
-                                                    <input type="text" class="form-control" name="institution"
-                                                        value="{{ metadata.education[0].institution if metadata.education }}">
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="form-group">
-                                                    <label>Graduation Date:</label>
-                                                    <input type="text" class="form-control" name="graduation_date"
-                                                        value="{{ metadata.education[0].graduation_date if metadata.education }}">
-                                                </div>
-                                            </div>
-                                        </div>
-                                
-                                        <h4 class="mb-3 mt-4">Skills</h4>
-                                        <div class="form-group">
-                                            <label>Skills (comma-separated):</label>
-                                            <textarea class="form-control" name="skills"
-                                                rows="3">{{ metadata.skills|join(', ') if metadata.skills }}</textarea>
-                                        </div>
-                            <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Submit Application</button>
                             </form>
+                            </div>
+
+                    <!-- Profile Section -->
+                    <div id="profile" class="tab-pane fade">
+    <form method="post">
+                            <input type="hidden" name="save_metadata" value="1">
+
+                            <!-- Personal Info -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Personal Information</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Full Name:</label>
+                                        <input type="text" class="form-control" name="name" value="{{ metadata.name }}">
+                                        </div>
+                                    <div class="col-md-6">
+                                        <label>Years of Experience:</label>
+                                        <input type="text" class="form-control" name="years_of_experience" value="{{ metadata.years_of_experience }}">
+                                        </div>
+                                        </div>
+                                        </div>
+
+                            <!-- Contact Info -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Contact Information</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Email:</label>
+                                        <input type="email" class="form-control" name="email" value="{{ metadata.contact_information.email }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                        <label>Phone:</label>
+                                        <input type="tel" class="form-control" name="phone" value="{{ metadata.contact_information.phone }}">
+                                        </div>
+                                    <div class="col-md-6">
+                                        <label>LinkedIn:</label>
+                                        <input type="url" class="form-control" name="linkedin" value="{{ metadata.contact_information.linkedin }}">
+                                        </div>
+                                        </div>
+                                        </div>
+
+                            <!-- Address -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Address</h4>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label>City:</label>
+                                        <input type="text" class="form-control" name="city" value="{{ metadata.contact_information.current_address.city }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                        <label>State:</label>
+                                        <input type="text" class="form-control" name="state" value="{{ metadata.contact_information.current_address.state }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                        <label>Country:</label>
+                                        <input type="text" class="form-control" name="country"
+                                            value="{{ metadata.contact_information.current_address.country }}">
+                                        </div>
+                                    <div class="col-md-3">
+                                        <label>ZIP Code:</label>
+                                        <input type="text" class="form-control" name="zip_code"
+                                            value="{{ metadata.contact_information.current_address.zip_code }}">
+                                        </div>
+                                        </div>
+                                        </div>
+
+                            <!-- Experience -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Work Experience</h4>
+                                <div id="experience-container">
+                                    {% for job in metadata.experience %}
+                                    <div class="experience-item">
+                                        <input type="hidden" name="experience_count" value="{{ metadata.experience|length }}">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Job Title:</label>
+                                                <input type="text" class="form-control" name="job_title_{{ loop.index0 }}" value="{{ job.job_title }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>Company:</label>
+                                                <input type="text" class="form-control" name="company_{{ loop.index0 }}" value="{{ job.company }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-md-6">
+                                                <label>Location:</label>
+                                                <input type="text" class="form-control" name="location_{{ loop.index0 }}" value="{{ job.location }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>Start Date:</label>
+                                                <input type="text" class="form-control" name="start_date_{{ loop.index0 }}" value="{{ job.start_date }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label>End Date:</label>
+                                                <input type="text" class="form-control" name="end_date_{{ loop.index0 }}" value="{{ job.end_date }}">
+                                            </div>
+                                        </div>
+                                        <div class="row mt-2">
+                                            <div class="col-12">
+                                                <label>Responsibilities (one per line):</label>
+                                                <textarea class="form-control" name="responsibilities_{{ loop.index0 }}"
+                                                    rows="3">{{ job.responsibilities|join('\n') }}</textarea>
+                                            </div>
+                                        </div>
+                                        </div>
+                                        {% endfor %}
+                                </div>
+                                <button type="button" class="btn btn-secondary mt-3" onclick="addExperience()">Add Experience</button>
+                                </div>
+
+                            <!-- Skills -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Skills</h4>
+                                <textarea class="form-control" name="skills" rows="3">{{ metadata.skills|join(', ') if metadata.skills }}</textarea>
+                            </div>
+
+                            <!-- Certifications -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Certifications</h4>
+                                {% for cert in metadata.certifications %}
+                                <span class="badge bg-secondary">{{ cert }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Salary -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Expected Salary</h4>
+                                <input type="text" class="form-control" name="user_salary" value="{{ metadata.user_salary }}">
+                            </div>
+
+                            <!-- Education Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Education</h4>
+                                {% for edu in metadata.education %}
+                                <div class="education-item mb-3">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label>Degree:</label>
+                                            <input type="text" class="form-control" name="degree" value="{{ edu.degree }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Field of Study:</label>
+                                            <input type="text" class="form-control" name="field_of_study" value="{{ edu.field_of_study }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Institution:</label>
+                                            <input type="text" class="form-control" name="institution" value="{{ edu.institution }}">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label>Graduation Date:</label>
+                                            <input type="text" class="form-control" name="graduation_date" value="{{ edu.graduation_date }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Industries Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Industries</h4>
+                                <textarea class="form-control" name="industries"
+                                    rows="2">{{ metadata.industries|join(', ') if metadata.industries }}</textarea>
+                            </div>
+                            
+                            <!-- Certifications Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Certifications</h4>
+                                <textarea class="form-control" name="certifications"
+                                    rows="2">{{ metadata.certifications|join(', ') if metadata.certifications }}</textarea>
+                            </div>
+
+                            <!-- Projects Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Projects</h4>
+                                <textarea class="form-control" name="projects"
+                                    rows="2">{{ metadata.projects|join(', ') if metadata.projects }}</textarea>
+                            </div>
+                            <!-- Languages Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Languages</h4>
+                                <textarea class="form-control" name="languages"
+                                    rows="2">{{ metadata.languages|join(', ') if metadata.languages }}</textarea>
+                            </div>
+                            
+                            <!-- Relevant Job Titles Section -->
+                            <div class="profile-section">
+                                <h4 class="mb-3">Relevant Job Titles</h4>
+                                <div class="mb-3">
+                                    {% for title in metadata.relevant_job_titles %}
+                                    <span class="badge bg-secondary">{{ title }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary mt-4">Save Profile</button>
+    </form>
                     </div>
-                    </div>
-                    </div>
-                    </div>
-                    </div>
-                    
-                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+                </div>
+                </div>
+                </div>
+                </div>
+                
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Auto-hide alerts after 3 seconds
+        let alertBox = document.querySelector(".alert");
+        if (alertBox) {
+            setTimeout(() => {
+                alertBox.style.display = "none";
+            }, 3000);
+        }
+
+        // Handle job application submission
+        document.getElementById("job_form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            let submitBtn = document.getElementById("job_submit_btn");
+            let jobUrl = document.getElementById("job_url").value;
+
+            if (!jobUrl) {
+                alert("Please enter a job URL.");
+                return;
+            }
+
+            submitBtn.innerHTML = "Applying...";
+            submitBtn.disabled = true;
+
+            fetch("/", {
+                method: "POST",
+                body: new FormData(this)
+            }).then(response => response.text()).then(() => {
+                submitBtn.innerHTML = "Submit Application";
+                submitBtn.disabled = false;
+                alert("Application submitted successfully!");
+            }).catch(() => {
+                submitBtn.innerHTML = "Submit Application";
+                submitBtn.disabled = false;
+                alert("Error submitting application.");
+            });
+        });
+    });
+</script>
+
 
 </html>
