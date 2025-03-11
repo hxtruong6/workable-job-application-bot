@@ -1,5 +1,9 @@
 # Workable Job Application Bot
 
+The Architecture of the project:
+
+<img src="https://raw.githubusercontent.com/hxtruong6/workable-job-application-bot/refs/heads/main/overview.png" alt="Image" style="max-width: 400px;">
+
 An automated tool for applying to jobs on Workable.com, featuring intelligent form detection and filling capabilities.
 <!--  make sure two columns each column has one image -->
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
