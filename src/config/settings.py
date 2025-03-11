@@ -33,6 +33,11 @@ class Settings:
     RESUME_DIR.mkdir(parents=True, exist_ok=True)
     USER_METADATA_PATH = BASE_DIR / "data" / "user_metadata.json"
 
+    # OpenAI Configuration
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    if not OPENAI_API_KEY:
+        raise ValueError("OPENAI_API_KEY environment variable is required")
+
     @classmethod
     def validate(cls):
         """Validate all settings are properly configured."""

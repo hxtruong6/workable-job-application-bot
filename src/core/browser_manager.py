@@ -113,6 +113,54 @@ class BrowserManager:
             logger.error(f"Failed to navigate to {url}: {str(e)}")
             raise
 
+    async def accept_cookies(self, page: Page) -> None:
+        """Accept cookies on the page."""
+        try:
+            # Check if cookies are already accepted
+            cookies_button = await page.query_selector(
+                'button[data-ui="cookie-consent-accept"]'
+            )
+            if cookies_button:
+                await cookies_button.click()
+                logger.info("Cookies accepted")
+            else:
+                logger.warning("No cookies button found")
+        except Exception as e:
+            logger.error(f"Failed to accept cookies: {str(e)}")
+            raise
+
+    async def handle_captcha(self, page: Page) -> None:
+        """Handle captcha on the page."""
+
+        try:
+            # Check for captcha
+            captcha_element = await page.query_selector("[data-sitekey]")
+            if captcha_element:
+                site_key = await captcha_element.get_attribute("data-sitekey")
+                captcha_type = (
+                    "recaptcha"
+                    if "recaptcha" in str(captcha_element).lower()
+                    else "hcaptcha"
+                )
+
+                if captcha_type == "recaptcha":
+                    solution = self.captcha_solver.solve_recaptcha(
+                        site_key, self.job_url
+                    )
+                else:
+                    solution = self.captcha_solver.solve_hcaptcha(
+                        site_key, self.job_url
+                    )
+
+                if solution:
+                    await page.evaluate(
+                        f'document.getElementById("g-recaptcha-response").innerHTML="{solution}";'
+                    )
+                    logger.info("Captcha solved and applied")
+        except Exception as e:
+            logger.error(f"Failed to handle captcha: {str(e)}")
+            raise
+
     async def close(self):
         """Close the browser and cleanup resources."""
         if self._is_closed:

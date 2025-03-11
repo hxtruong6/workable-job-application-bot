@@ -33,10 +33,17 @@ class JobApplicationManager:
         try:
             with open(self.metadata_path, "r") as f:
                 self.user_metadata = json.load(f)
+            await self.custom_metadata_processing()
             logger.info(f"Loaded metadata from {self.metadata_path}")
         except Exception as e:
             logger.error(f"Failed to load metadata: {str(e)}")
             raise
+
+    async def custom_metadata_processing(self):
+        """Custom metadata processing."""
+        first_name, last_name = self.user_metadata["name"].split(" ")
+        self.user_metadata["first_name"] = first_name
+        self.user_metadata["last_name"] = last_name
 
     @retry(
         stop=stop_after_attempt(3),
@@ -76,30 +83,11 @@ class JobApplicationManager:
                     logger.info(f"Navigating to {self.job_url}")
                     await self.browser_manager.goto_page(self.job_url, page)
 
-                    # Check for captcha
-                    captcha_element = await page.query_selector("[data-sitekey]")
-                    if captcha_element:
-                        site_key = await captcha_element.get_attribute("data-sitekey")
-                        captcha_type = (
-                            "recaptcha"
-                            if "recaptcha" in str(captcha_element).lower()
-                            else "hcaptcha"
-                        )
+                    # Accept cookies
+                    await self.browser_manager.accept_cookies(page)
 
-                        if captcha_type == "recaptcha":
-                            solution = self.captcha_solver.solve_recaptcha(
-                                site_key, self.job_url
-                            )
-                        else:
-                            solution = self.captcha_solver.solve_hcaptcha(
-                                site_key, self.job_url
-                            )
-
-                        if solution:
-                            await page.evaluate(
-                                f'document.getElementById("g-recaptcha-response").innerHTML="{solution}";'
-                            )
-                            logger.info("Captcha solved and applied")
+                    # Handle captcha
+                    await self.browser_manager.handle_captcha(page)
 
                     # Fill and submit form
                     self.form_handler = FormHandler(page, self.user_metadata)
@@ -182,6 +170,9 @@ def cli():
 
     args = parser.parse_args()
 
+    logger.info(f"Job URL: {args.job_url}")
+    logger.info(f"Metadata Path: {args.metadata_path}")
+
     # Run the application
     success = asyncio.run(main(args.job_url, args.metadata_path))
 
@@ -189,5 +180,22 @@ def cli():
     exit(0 if success else 1)
 
 
+def cli_test(job_url: Optional[str] = None, metadata_path: Optional[str] = None):
+    logger.info(f"Job URL: {job_url}")
+    logger.info(f"Metadata Path: {metadata_path}")
+
+    # Run the application
+    success = asyncio.run(main(job_url, metadata_path))
+
+    # Exit with appropriate status code
+    exit(0 if success else 1)
+
+
 if __name__ == "__main__":
-    cli()
+    # cli()
+
+    # --------- Testing
+    # job_url = "https://jobs.workable.com/view/7ZLabkcPX4G2m9SBesq7Yd/hybrid-customer-success-and-product-manager-(1099-contract%2C-triive)-in-bentonville-at-high-alpha-innovation"
+    job_url = "https://jobs.workable.com/view/beZTS1rb1b4EyK4Sf8jHUk/software-engineer-intern-in-phoenix-at-prepass%2C-llc"
+    metadata_path = "data/user_metadata.json"
+    cli_test(job_url, metadata_path)
